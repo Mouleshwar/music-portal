@@ -2,7 +2,7 @@
   "dev": {
     "driver": "mysql",
     "user": "root",
-    "database": "tutorial",
+    "database": "musicportal",
     "password": "#1paradox"
   },
  

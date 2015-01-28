@@ -5,9 +5,15 @@
 	<script src="controllers.js"></script>
 </head>
 <body ng-controller='DataController'>
-	Username: <input type='text' ng-model="username">
-	Password: <input type='password' ng-model="password">
-	<button ng-click="sendData(username,password)">Submit</button>
-	<p >{{ data }}</p>
+	Date: <input type='text' ng-model="date"></br>
+	Time: <input type='time' ng-model="time"></br>
+	Band: <input type='text' ng-model="band"></br>
+	Venue: <input type='text' ng-model="venue"></br>
+	<ul>
+		<li ng-repeat="gig in gig_data">
+			<p>{{gig.id}} {{gig.date}} {{gig.time}} {{gig.band}} {{gig.venue}}</p>
+		</li>
+	</ul>
+	<button ng-click="sendData(date,time,band,venue)">Submit</button>
 </body>
 </html>

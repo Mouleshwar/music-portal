@@ -41,44 +41,38 @@ var sequelize = new Sequelize(
 var crypto = require('crypto');
 var DataTypes = require("sequelize");
 
-var User = sequelize.define('users', {
-    username: DataTypes.STRING,
-    password: DataTypes.STRING
+var User = sequelize.define('gigs', {
+    date: DataTypes.STRING
+    time: DataTypes.STRING,
+    band: DataTypes.STRING,
+    venue: DataTypes.STRING
   }, {
     instanceMethods: {
       retrieveAll: function(onSuccess, onError) {
 		User.findAll({}, {raw: true})
 			.success(onSuccess).error(onError);	
 	  },
-      retrieveById: function(user_id, onSuccess, onError) {
-		User.find({where: {id: user_id}}, {raw: true})
-			.success(onSuccess).error(onError);	
-	  },
       add: function(onSuccess, onError) {
-		var username = this.username;
-		var password = this.password;
-		
-		var shasum = crypto.createHash('sha1');
-		shasum.update(password);
-		password = shasum.digest('hex');
-		
-		User.build({ username: username, password: password })
+		var date = this.date;
+		var time = this.time;
+		var band = this.band;
+		var venue = this.venue;
+				
+		User.build({ date: date, time: time, band: band, venue: venue })
 			.save().success(onSuccess).error(onError);
 	   },
-	  updateById: function(user_id, onSuccess, onError) {
-		var id = user_id;
-		var username = this.username;
-		var password = this.password;
-		
-		var shasum = crypto.createHash('sha1');
-		shasum.update(password);
-		password = shasum.digest('hex');
-					
-		User.update({ username: username,password: password},{where: {id: id} })
-			.success(onSuccess).error(onError);
-	   },
-      removeById: function(user_id, onSuccess, onError) {
-		User.destroy({where: {id: user_id}}).success(onSuccess).error(onError);	
+	  updateById: function(id, onSuccess, onError){
+	  		var id = id;
+	  		var date = this.date;
+	  		var time = this.time;
+	  		var band = this.band;
+	  		var venue = this.venue;
+
+	  		User.update({date: date, time: time,band: band, venue: venue},{where: {id: id} })
+	  		.success(onSuccess).error(onError);
+	  },
+      removeById: function(id, onSuccess, onError) {
+		User.destroy({where: {id: id}}).success(onSuccess).error(onError);	
 	  },
 	  removeAll: function(onSuccess,onError){
 	  	User.destroy({where:{}},{raw: true}).success(onSuccess).error(onError);
@@ -90,20 +84,24 @@ var User = sequelize.define('users', {
 
 var router = express.Router();
 
-router.route('/users')
+router.route('/gigs/add')
 
 .post(function(req,res){
-	var username = req.body.username;
-	var password = req.body.password;
+	var date = req.body.date;
+	var time = req.body.time;
+	var band = req.body.band;
+	var venue = req.body.venue;
 
-	var user = User.build({username:username,password:password});
-	user.add(function(success){
+	var gig = User.build({date: date, time: time, band: band, venue: venue});
+	gig.add(function(success){
 		res.json({message: "User created!"});
 	},
 	function(err){
 		res.send(get);
 	});
-})
+});
+
+router.route('/gigs')
 
 .get(function(req,res){
 	var user = User.build();
@@ -119,12 +117,19 @@ router.route('/users')
 	});
 });
 
-router.route('/users/delete')
-.get(function(req,res){
+router.route('/gigs/update/:id')
+
+.put(function(req,res){
 	var user = User.build();
-	user.removeAll(function(users){
+
+	var date = req.body.date;
+	var time = req.body.time;
+	var band = req.body.band;
+	var venue = req.body.venue;
+	
+	user.updateById(req.params.id,function(users){
 		if(users){
-			res.send("user deleted");
+			res.send("Gig Updated");
 		} else {
 			res.send(401,"401 blah blah");
 		}
@@ -132,40 +137,6 @@ router.route('/users/delete')
 	function(error){
 		res.send("some error occured");
 	})
-});
-
-router.route('/users/:user_id')
-
-.put(function(req,res){	
-	var user = User.build();
-
-	user.username = req.body.username;
-	user.password = req.body.password;
-
-	user.updateById(req.params.user_id,function(success){
-		console.log(success);
-		if(success){
-			res.json({message:"User updated!"});
-		} else {
-			res.send(401,"User not found!");
-		}
-	}, function(error){
-		res.send("User not found!");
-	});
-})
-
-.get(function(req, res) {
-	var user = User.build();
-	
-	user.retrieveById(req.params.user_id, function(users) {
-		if (users) {				
-		  res.json(users);
-		} else {
-		  res.send(401, "User not found");
-		}
-	  }, function(error) {
-		res.send("User not found");
-	  });
 })
 
 // delete a user by id (accessed at DELETE http://localhost:8080/api/users/:user_id)
