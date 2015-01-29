@@ -1,9 +1,9 @@
 {
   "dev": {
     "driver": "mysql",
-    "user": "root",
+    "user": "username",
     "database": "musicportal",
-    "password": "#1paradox"
+    "password": "password"
   },
  
   "production": {
